@@ -40,9 +40,9 @@ class FeedController {
       .catch(err => console.error('Error adding trigger subscription.' , err))
   }
 
-  remove_trigger (trigger) {
+  remove_trigger (namespace, trigger) {
     const mgr = this.mqtt_subscription_mgr
-    return this.trigger_store.remove(trigger).then(() => mgr.unsubscribe(trigger.url, trigger.topic))
+    return this.trigger_store.remove(`${namespace}/${trigger}`).then(() => mgr.unsubscribe(trigger.url, trigger.topic))
       .catch(err => console.error('Error removing trigger subscription.' , err))
   }
 }
