@@ -166,3 +166,13 @@ test('should unsubscribe with certain listeners', t => {
     resolve()
   })
 })
+
+test('should return client connection status for live topics', t => {
+    const mqtt_subscription_mgr = new MQTTSubscriptionMgr(t.context.mqtt)
+
+    mqtt_subscription_mgr.connections.set('connected_broker', {client: {connected: true}})
+    mqtt_subscription_mgr.connections.set('disconnected_broker', {client: {connected: false}})
+    t.is(false, mqtt_subscription_mgr.is_connected('sample'))
+    t.is(true, mqtt_subscription_mgr.is_connected('connected_broker'))
+    t.is(false, mqtt_subscription_mgr.is_connected('disconnected_broker'))
+})

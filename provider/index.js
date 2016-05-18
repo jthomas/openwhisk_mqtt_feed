@@ -7,16 +7,14 @@ const app = express()
 const bodyparser = require('body-parser')
 app.use(bodyparser.json())
 
-let creds = null
+let creds = {}
 // extract cloudant credentials from environment
 if (process.env.VCAP_SERVICES) {
   const appEnv = require('cfenv').getAppEnv()
   creds = appEnv.getServiceCreds(/cloudant/i)
 } else if (process.env.CLOUDANT_USERNAME && process.env.CLOUDANT_PASSWORD){
-  creds = {
-    username: process.env.CLOUDANT_USERNAME,
-    password: process.env.CLOUDANT_PASSWORD
-  }
+  creds.username = process.env.CLOUDANT_USERNAME
+  creds.password = process.env.CLOUDANT_PASSWORD
 }
 
 if (!creds.username || !creds.password) {
@@ -34,7 +32,6 @@ feed_controller.initialise().then(() => {
   }
 
   app.post('/mqtt', function (req, res) {
-    // todo: need to validate incoming parameters
     // trigger (namespace/name), url, topic, username, password
     feed_controller.add_trigger(req.body).then(() => res.send())
       .catch(err => handle_error(err, 'failed to add MQTT topic trigger', res))

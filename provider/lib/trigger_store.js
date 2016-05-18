@@ -17,10 +17,10 @@ class TriggerStore {
   }
 
   triggers (url, topic) {
-    const key = `${url}#${topic}`
+    const key = topic ? `${url}#${topic}` : url
     const _view = Promise.promisify(this.db.view, {context: this.db})
     const extract_triggers = body => body.rows.map(row => row.value)
-    return _view('subscriptions', 'host_topic_triggers', {startkey: key, endkey: key}).then(extract_triggers)
+    return _view('subscriptions', topic ? 'host_topic_triggers' : 'host_triggers', {startkey: key, endkey: key}).then(extract_triggers)
   }
 
   subscribers () {

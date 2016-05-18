@@ -28,13 +28,17 @@ class MQTTSubscriptionMgr extends EventEmitter {
     const events = ['connect', 'reconnect', 'close', 'offline']
 
     events.forEach(event => {
-      client.on(event, () => console.log(`Connection (${url}) status event: ${event}`))
+      client.on(event, () => {
+        console.log(`Connection (${url}) status event: ${event}`)
+        if (event === 'connect') this.emit('connected', url)
+        if (event === 'offline') this.emit('disconnected', url)
+      })
     })
 
     client.on('error', error => console.error('Connection error (${url}):', error))
 
     client.on('message', (topic, message) => {
-      this.emit('message', url, topic, message)
+      this.emit('message', url, topic, message.toString())
     })
   }
 
@@ -45,12 +49,20 @@ class MQTTSubscriptionMgr extends EventEmitter {
     }
   }
 
+  is_connected (url) {
+    if (!this.connections.has(url)) {
+      return false
+    }
+
+    return this.connections.get(url).client.connected
+  }
+
   subscribe (url, topic) {
     const topic_client = this.conn_client(url)
     const listener_count = (topic_client.topics.get(topic) || 0)
 
     if (!listener_count) {
-      topic_client.client.subscribe(topic, this.on_subscribe)
+      topic_client.client.subscribe(topic, (err, topics) => this.on_subscribe(err, topics, url))
     }
 
     topic_client.topics.set(topic, listener_count + 1)
@@ -70,11 +82,11 @@ class MQTTSubscriptionMgr extends EventEmitter {
     }
   }
 
-  on_subscribe (err, topics) {
+  on_subscribe (err, topics, url) {
     if (err) {
       return console.error(err)
     }
-    topics.forEach(topic => console.log(`Subscribed to ${topic.topic}`))
+    topics.forEach(topic => console.log(`Subscribed to ${url}#${topic.topic}`))
   }
 }
 

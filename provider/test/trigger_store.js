@@ -73,6 +73,17 @@ test('should retrieve triggers for url and topic', t => {
   }).catch(e => console.log(e))
 })
 
+test('should retrieve triggers for url', t => {
+  const store = new TriggerStore(t.context.db)
+  const url = 'sample'
+  const topic = 'sample'
+
+  return store.triggers(url).then((triggers) => {
+    t.deepEqual(triggers, ['a', 'b', 'c'])
+    t.deepEqual(t.context.params, {startkey: `${url}`, endkey: `${url}`})
+  }).catch(e => console.log(e))
+})
+
 test('should retrieve all subscribers', t => {
   const store = new TriggerStore(t.context.db)
 
