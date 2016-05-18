@@ -15,14 +15,17 @@ class FeedController {
     mgr.on('message', (url, topic, message) => this.on_message(url, topic, message))
     return this.trigger_store.subscribers().then(subscribers => {
        subscribers.forEach(s => mgr.subscribe.apply(mgr, s.topic.split('#')))
-    }).catch(err => console.error('Error initialising subscribers from store.' , err))
+    }).catch(err => {
+      console.error('Error initialising subscribers from couchdb store.' , err.reason)
+      return Promise.reject('Unable to initialise due to store failure.')
+    })
   }
 
   on_message (url, topic, message) {
     console.log(`Message received (${url}) #${topic}: ${message}`)
     this.trigger_store.triggers(url, topic).then(triggers => {
       triggers.forEach(trigger => this.fire_trigger(trigger))
-    }).catch(err => console.error('Unable to forward message to triggers.', err))
+    }).catch(err => console.error('Unable to forward message to triggers.', err.reason))
   }
 
   fire_trigger (trigger) {
@@ -31,19 +34,17 @@ class FeedController {
     var ow = openwhisk({api: this.ow_endpoint, api_key: `${trigger.username}:${trigger.password}`, namespace: namespace});
     ow.triggers.invoke({triggerName: name})
       .then(() => console.log(`Fired trigger: ${trigger.trigger}`))
-      .catch(err => console.error(`Failed to fire trigger ${trigger.trigger}`, err))
+      .catch(err => console.error(`Failed to fire trigger ${trigger.trigger}`, err.reason))
   }
 
   add_trigger (trigger) {
     const mgr = this.mqtt_subscription_mgr
     return this.trigger_store.add(trigger).then(() => mgr.subscribe(trigger.url, trigger.topic))
-      .catch(err => console.error('Error adding trigger subscription.' , err))
   }
 
   remove_trigger (namespace, trigger) {
     const mgr = this.mqtt_subscription_mgr
     return this.trigger_store.remove(`${namespace}/${trigger}`).then(() => mgr.unsubscribe(trigger.url, trigger.topic))
-      .catch(err => console.error('Error removing trigger subscription.' , err))
   }
 }
 
