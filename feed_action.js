@@ -25,21 +25,27 @@ function create (msg) {
     method: "POST",
     uri: msg.provider_endpoint,
     json: body
-  }, function(err, res, body) {
-    if (!err && res.statusCode === 200) {
-      console.log('mqtt feed: http request success.');
-      return whisk.done();
-    } 
-
-    if(res) {
-      console.log('mqtt feed: Error invoking provider:', res.statusCode, body);
-      whisk.error(body.error);
-    } else {
-      console.log('mqtt feed: Error invoking provider:', err);
-      whisk.error();
-    }
-  });
+  }, handle_response);
 }
 
 function remove (msg) {
+  request({
+    method: "DELETE",
+    uri: msg.provider_endpoint + msg.triggerName
+  }, handle_response);
 }
+
+function handle_response (err, res, body) {
+  if (!err && res.statusCode === 200) {
+    console.log('mqtt feed: http request success.');
+    return whisk.done();
+  } 
+
+  if(res) {
+    console.log('mqtt feed: Error invoking provider:', res.statusCode, body);
+    whisk.error(body.error);
+  } else {
+    console.log('mqtt feed: Error invoking provider:', err);
+    whisk.error();
+  }
+} 
