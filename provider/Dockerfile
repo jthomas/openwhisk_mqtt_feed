@@ -1,10 +1,10 @@
-FROM mhart/alpine-node:latest
+FROM mhart/alpine-node:6 
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 ADD . .
 
-RUN npm install
+RUN npm install --production
 
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["sh", "scripts/start.sh"]
