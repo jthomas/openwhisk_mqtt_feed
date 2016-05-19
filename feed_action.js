@@ -1,3 +1,5 @@
+var request = require('request');
+
 function main (msg) {
   console.dir(msg);
   if (msg.lifecycleEvent === 'CREATE') {
@@ -6,7 +8,7 @@ function main (msg) {
     remove(msg)
   }
 
- // return whisk.async();
+  return whisk.async();
 }
 
 function create (msg) {
@@ -19,6 +21,24 @@ function create (msg) {
     password: user_pass[1]
   }
   console.dir(body)
+  request({
+    method: "POST",
+    uri: msg.provider_endpoint,
+    json: body
+  }, function(err, res, body) {
+    if (!err && res.statusCode === 200) {
+      console.log('mqtt feed: http request success.');
+      return whisk.done();
+    } 
+
+    if(res) {
+      console.log('mqtt feed: Error invoking provider:', res.statusCode, body);
+      whisk.error(body.error);
+    } else {
+      console.log('mqtt feed: Error invoking provider:', err);
+      whisk.error();
+    }
+  });
 }
 
 function remove (msg) {
