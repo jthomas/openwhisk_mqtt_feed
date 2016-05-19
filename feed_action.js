@@ -12,6 +12,10 @@ function main (msg) {
 }
 
 function create (msg) {
+  if (!msg.hasOwnProperty('url') || !msg.hasOwnProperty('topic')) {
+    return whisk.error('Missing mandatory feed properties, must include url and topic.');
+  }
+
   var user_pass = msg.authKey.split(':');
   var body = {
     trigger: msg.triggerName.slice(1),
