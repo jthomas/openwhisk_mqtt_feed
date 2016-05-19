@@ -1,10 +1,10 @@
 # openwhisk_mqtt_feed
 
-MQTT package for OpenWhisk, provides a topic subscriber feed. 
+[MQTT](http://mqtt.org/) package for [OpenWhisk](https://github.com/openwhisk/openwhisk), provides a topic subscriber feed. 
 
-Messages received on the broker topic will be forwarded as trigger activiations.
+Messages received on the broker topic will be forwarded as [trigger activiations](https://github.com/openwhisk/openwhisk/blob/master/docs/triggers_rules.md#triggers).
 
-This project provides the feed action, used to handle trigger registration and deletion events, along with the MQTT subscriber service. This backend service handles subscribing to MQTT messages for registered topics and executing the registered triggers when messages arrive.
+This project provides the [feed action](https://github.com/openwhisk/openwhisk/blob/master/docs/actions.md), used to handle trigger registration and deletion events, along with the MQTT subscriber service. This backend service handles subscribing to MQTT messages for registered topics and executing the registered triggers when messages arrive.
 
 ## usage
 
@@ -14,7 +14,7 @@ _This feed is currently available for testing as a shared package on IBM Bluemix
 
 ## deployment
 
-Installing a new feed provider requires you to deploy the backend service, register the package and create the feed action. Users must have an account with an OpenWhisk instance and followed the instructions to setup their CLI. Cloudant is used to persist trigger registration state by the backend service. Users need to register an account with this service provider.
+Installing a new feed provider requires you to deploy the backend service, register the package and create the feed action. Users must have an account with an [OpenWhisk instance](https://new-console.ng.bluemix.net/openwhisk/) and followed the instructions to [setup their CLI](https://github.com/openwhisk/openwhisk/tree/master/docs#setting-up-openwhisk). [Cloudant](https://cloudant.com/) is used to persist trigger registration state by the backend service. Users need to register an account with this service provider.
 
 ### deploy service provider
 
@@ -25,7 +25,7 @@ $ docker build -t user_name/mqtt_feed_provider .
 $ docker run -e CLOUDANT_USERNAME='username' -e CLOUDANT_PASSWORD='password' -p 3000:3000 user_name/mqtt_feed_provider
 ```
 
-This image can be deployed to IBM Containers service. The application is configured to register any bound service credentials for Cloudant, rather than having to set environment variables manually.
+This image can be deployed to [IBM Containers](https://console.ng.bluemix.net/docs/containers/container_index.html) service. The application is configured to register any [bound service credentials](https://new-console.ng.bluemix.net/docs/containers/container_creating_ov.html#container_binding) for Cloudant, rather than having to set environment variables manually.
 
 ```
 $ docker tag user_name/mqtt_feed_provider registry.ng.bluemix.net/user_name/mqtt_feed_provider
