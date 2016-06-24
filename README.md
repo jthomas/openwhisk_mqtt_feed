@@ -16,6 +16,35 @@ _This feed is currently available for testing as a shared package on IBM Bluemix
 
 Installing a new feed provider requires you to deploy the backend service, register the package and create the feed action. Users must have an account with an [OpenWhisk instance](https://new-console.ng.bluemix.net/openwhisk/) and followed the instructions to [setup their CLI](https://github.com/openwhisk/openwhisk/tree/master/docs#setting-up-openwhisk). [Cloudant](https://cloudant.com/) is used to persist trigger registration state by the backend service. Users need to register an account with this service provider.
 
+### initialise database
+
+Create this database in the CouchDB instance used by the application. 
+
+* _topic\_listeners_
+
+Add the following [Views](http://guide.couchdb.org/draft/views.html) to the _subscriptions_ design document.
+
+```
+{
+  "_id": "_design/subscriptions"
+  "views": {
+    "host_topic_counts": {
+      "reduce": "_sum",
+      "map": "function (doc) {\n  emit(doc.url + '#' + doc.topic, 1);\n}"
+    },
+    "host_topic_triggers": {
+      "map": "function (doc) {\n  emit(doc.url + '#' + doc.topic, {trigger: doc._id, username: doc.username, password: doc.password});\n}"
+    },
+    "all": {
+      "map": "function (doc) {\n  emit(doc._id, doc.url + '#' + doc.topic);\n}"
+    },
+    "host_triggers": {
+      "map": "function (doc) {\n  emit(doc.url, {trigger: doc._id, username: doc.username, password: doc.password});\n}"
+    }
+  }
+}
+```
+
 ### deploy service provider
 
 Docker is used to build and deploy the service provider.
