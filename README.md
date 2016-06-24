@@ -26,7 +26,7 @@ Add the following [Views](http://guide.couchdb.org/draft/views.html) to the _sub
 
 ```
 {
-  "_id": "_design/subscriptions"
+  "_id": "_design/subscriptions",
   "views": {
     "host_topic_counts": {
       "reduce": "_sum",
