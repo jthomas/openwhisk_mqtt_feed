@@ -18,7 +18,7 @@ function create (msg) {
 
   var user_pass = msg.authKey.split(':');
   var body = {
-    trigger: msg.triggerName.slice(1),
+    trigger: msg.triggerName,
     url: msg.url,
     topic: msg.topic,
     username: user_pass[0],
